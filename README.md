@@ -100,7 +100,7 @@ A web-based clinical decision support tool is currently being developed where ph
 
 If you use this work, please cite:
 ```
-alam, M. (2026). Colorectal Cancer Risk Prediction Using Machine Learning.
+Alam, M. (2026). Colorectal Cancer Risk Prediction Using Machine Learning.
 Queensborough Community College, CUNY.
 Advisor: Prof. Zeynep Akcay Ozkan.
 ```
