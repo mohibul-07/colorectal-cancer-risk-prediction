@@ -11,7 +11,7 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("http://localhost:8004/predict", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
