@@ -5,10 +5,10 @@ import pandas as pd
 import shap
 
 # Load model and metadata
-with open("models/best_xgb_model.pkl", "rb") as f:
+with open("models/best_xgb_v2_apc.pkl", "rb") as f:
     model = pickle.load(f)
 
-with open("models/model_metadata.json", "r") as f:
+with open("models/model_metadata_v2.json", "r") as f:
     metadata = json.load(f)
 
 FEATURES = metadata["feature_names"]

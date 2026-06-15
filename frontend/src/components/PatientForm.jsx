@@ -9,31 +9,43 @@ const defaultValues = {
   platelet_count: 250, creatinine: 0.9, high_creatinine: 0,
   high_platelets: 0, low_platelets: 0, alt: 25, ast: 22, wbc: 6.5,
   rectal_bleeding: 0, weight_loss: 0, bowel_changes: 0, abdominal_pain: 0,
-  family_history_crc: 0, lynch_any: 0,
+  family_history_crc: 0, lynch_any: 0, apc_any: 0,
 };
 
-function Section({ title, color, children }) {
+const sectionStyles = {
+  demographics: { icon: "👤", accent: "border-l-indigo-500", badge: "bg-indigo-50 text-indigo-700" },
+  clinical:     { icon: "🔬", accent: "border-l-sky-500",    badge: "bg-sky-50 text-sky-700" },
+  symptoms:     { icon: "⚕️", accent: "border-l-rose-500",   badge: "bg-rose-50 text-rose-700" },
+  lifestyle:    { icon: "📊", accent: "border-l-violet-500",  badge: "bg-violet-50 text-violet-700" },
+  genomic:      { icon: "🧬", accent: "border-l-emerald-500", badge: "bg-emerald-50 text-emerald-700" },
+};
+
+function Section({ title, styleKey, children }) {
+  const s = sectionStyles[styleKey];
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-      <h3 className={`text-sm font-bold mb-4 pb-2 border-b ${color}`}>{title}</h3>
-      <div className="grid grid-cols-2 gap-4">{children}</div>
+    <div className={`bg-white rounded-xl shadow-sm border border-gray-100 border-l-4 ${s.accent} overflow-hidden`}>
+      <div className="px-5 pt-5 pb-3 flex items-center gap-2.5">
+        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${s.badge}`}>
+          {s.icon} {title}
+        </span>
+      </div>
+      <div className="px-5 pb-5 grid grid-cols-2 gap-x-4 gap-y-3">{children}</div>
     </div>
   );
 }
 
-function Field({ label, name, value, onChange, min, max, step = "1", options }) {
+function Field({ label, name, value, onChange, min, max, step = "1", options, span2 }) {
+  const baseClass = "w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white transition focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 hover:border-gray-300";
   return (
-    <div>
-      <label className="block text-xs font-medium text-slate-600 mb-1">{label}</label>
+    <div className={span2 ? "col-span-2" : ""}>
+      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
       {options ? (
-        <select name={name} value={value} onChange={onChange}
-          className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400">
+        <select name={name} value={value} onChange={onChange} className={baseClass}>
           {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       ) : (
         <input type="number" name={name} value={value} onChange={onChange}
-          min={min} max={max} step={step}
-          className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400" />
+          min={min} max={max} step={step} className={baseClass} />
       )}
     </div>
   );
@@ -55,12 +67,13 @@ export default function PatientForm({ onSubmit, loading, error }) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-800">Patient Risk Assessment</h2>
-        <p className="text-slate-500 text-sm mt-1">Enter patient data to calculate colorectal cancer risk score</p>
+        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Patient Risk Assessment</h2>
+        <p className="text-gray-500 text-sm mt-1">Enter patient data across all categories to generate a risk score.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-5">
-        <Section title="Demographics" color="text-teal-600 border-teal-100">
+        {/* ── Demographics ── */}
+        <Section title="Demographics" styleKey="demographics">
           <Field label="Age (years)" name="age" value={form.age} onChange={handleChange} min="18" max="100" />
           <Field label="Gender" name="gender" value={form.gender} onChange={handleChange}
             options={[{value:1,label:"Male"},{value:2,label:"Female"},{value:3,label:"Other"}]} />
@@ -70,7 +83,8 @@ export default function PatientForm({ onSubmit, loading, error }) {
             options={[{value:0,label:"Not Hispanic"},{value:1,label:"Hispanic/Latino"}]} />
         </Section>
 
-        <Section title="Clinical Measurements" color="text-blue-600 border-blue-100">
+        {/* ── Clinical Measurements ── */}
+        <Section title="Clinical Measurements" styleKey="clinical">
           <Field label="BMI" name="bmi" value={form.bmi} onChange={handleChange} min="10" max="80" step="0.1" />
           <Field label="Obese" name="obese" value={form.obese} onChange={handleChange}
             options={[{value:0,label:"No"},{value:1,label:"Yes"}]} />
@@ -89,7 +103,8 @@ export default function PatientForm({ onSubmit, loading, error }) {
             options={[{value:0,label:"No"},{value:1,label:"Yes"}]} />
         </Section>
 
-        <Section title="Symptoms" color="text-red-600 border-red-100">
+        {/* ── Symptoms ── */}
+        <Section title="Symptoms" styleKey="symptoms">
           <Field label="Rectal Bleeding" name="rectal_bleeding" value={form.rectal_bleeding} onChange={handleChange}
             options={[{value:0,label:"No"},{value:1,label:"Yes"}]} />
           <Field label="Unexplained Weight Loss" name="weight_loss" value={form.weight_loss} onChange={handleChange}
@@ -100,7 +115,8 @@ export default function PatientForm({ onSubmit, loading, error }) {
             options={[{value:0,label:"No"},{value:1,label:"Yes"}]} />
         </Section>
 
-        <Section title="Lifestyle & Socioeconomic" color="text-purple-600 border-purple-100">
+        {/* ── Lifestyle & Socioeconomic ── */}
+        <Section title="Lifestyle & Socioeconomic" styleKey="lifestyle">
           <Field label="Alcohol Use" name="alcohol_participant" value={form.alcohol_participant} onChange={handleChange}
             options={[{value:0,label:"No"},{value:1,label:"Yes"}]} />
           <Field label="Drink Frequency" name="alcohol_frequency" value={form.alcohol_frequency} onChange={handleChange}
@@ -121,21 +137,37 @@ export default function PatientForm({ onSubmit, loading, error }) {
             options={[{value:1,label:"Straight"},{value:2,label:"Gay/Lesbian"},{value:3,label:"Bisexual"},{value:4,label:"Other"}]} />
         </Section>
 
-        <Section title="Medical History & Genomic" color="text-green-600 border-green-100">
+        {/* ── Medical History & Genomic ── */}
+        <Section title="Medical History & Genomic" styleKey="genomic">
           <Field label="Family History of CRC" name="family_history_crc" value={form.family_history_crc} onChange={handleChange}
             options={[{value:0,label:"No"},{value:1,label:"Yes"}]} />
           <Field label="Lynch Syndrome Variant" name="lynch_any" value={form.lynch_any} onChange={handleChange}
             options={[{value:0,label:"No / Unknown"},{value:1,label:"Yes (pathogenic variant)"}]} />
+          <Field label="APC Variant" name="apc_any" value={form.apc_any} onChange={handleChange}
+            options={[{value:0,label:"No / Unknown"},{value:1,label:"Yes (pathogenic variant)"}]} />
+          <div className="col-span-2">
+            <p className="text-xs text-gray-400 mt-1">
+              Only pathogenic/likely pathogenic variants (ClinVar) are clinically relevant. Lynch: 14× enrichment · APC: 27× enrichment in cancer cases.
+            </p>
+          </div>
         </Section>
       </div>
 
       {error && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>
+        <div className="mt-5 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start gap-2">
+          <span className="mt-0.5">⚠️</span>
+          <span>{error}</span>
+        </div>
       )}
 
       <button type="submit" disabled={loading}
-        className="mt-6 w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 rounded-xl text-lg transition disabled:opacity-50">
-        {loading ? "Calculating Risk..." : "Calculate Cancer Risk Score"}
+        className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold py-3.5 rounded-xl text-base transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
+        {loading ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+            Calculating Risk…
+          </span>
+        ) : "Calculate Cancer Risk Score"}
       </button>
     </form>
   );

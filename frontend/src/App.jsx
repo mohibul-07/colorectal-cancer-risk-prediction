@@ -25,21 +25,46 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-slate-900 text-white py-4 px-6 shadow-lg">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-teal-400">CRC Risk Predictor</h1>
-            <p className="text-xs text-slate-400">Colorectal Cancer Risk Assessment Tool</p>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* ── Header ── */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-5xl mx-auto flex items-center justify-between px-6 py-5">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900 tracking-tight">CRC Risk Predictor</h1>
+              <p className="text-xs text-gray-500">Colorectal Cancer Risk Assessment</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-xs text-slate-400">Powered by XGBoost · AUC 0.8948</p>
-            <p className="text-xs text-slate-500">NIH All of Us Research Program</p>
+          <div className="hidden sm:flex items-center gap-4">
+            <span className="text-xs font-medium text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">XGBoost v2</span>
+            <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">AUC 0.8979</span>
           </div>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-8">
+      {/* ── Subheader ── */}
+      <div className="bg-indigo-600">
+        <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
+          <p className="text-indigo-100 text-xs">
+            Trained on NIH All of Us Research Program data · 12,248 patients · 31 features
+          </p>
+          <div className="hidden sm:flex items-center gap-3 text-xs text-indigo-200">
+            <span>Lynch</span>
+            <span className="w-1 h-1 rounded-full bg-indigo-300" />
+            <span>APC</span>
+            <span className="w-1 h-1 rounded-full bg-indigo-300" />
+            <span>SHAP</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Main ── */}
+      <main className="max-w-5xl mx-auto w-full px-6 py-8 flex-1">
         {!result ? (
           <PatientForm onSubmit={handleSubmit} loading={loading} error={error} />
         ) : (
@@ -47,8 +72,16 @@ export default function App() {
         )}
       </main>
 
-      <footer className="text-center py-4 text-xs text-slate-400">
-        Research tool only — not for clinical diagnosis · Queensborough Community College, CUNY
+      {/* ── Footer ── */}
+      <footer className="border-t border-gray-200 bg-white">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-xs text-gray-400">
+            Research tool only — not for clinical diagnosis
+          </p>
+          <p className="text-xs text-gray-400">
+            Queensborough Community College, CUNY · Prof. Zeynep Akcay Ozkan
+          </p>
+        </div>
       </footer>
     </div>
   );
