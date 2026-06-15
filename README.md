@@ -20,7 +20,7 @@ A machine learning system for colorectal cancer risk prediction integrating clin
 - **Optimal threshold:** 0.24 (maximizes cancer recall for screening context)
 - **Lynch syndrome enrichment:** 14× higher in cancer cases vs controls
 - **APC variant enrichment:** 27× higher in cancer cases (p = 0.000012)
-- **Top predictors (SHAP):** Age, ALT, Creatinine, BMI, Obesity
+- **Top predictors (SHAP):** Age, ALT, Creatinine, BMI
 
 ## Dataset
 
