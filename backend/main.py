@@ -38,11 +38,15 @@ class PatientInput(BaseModel):
     ast: float
     wbc: float
     rectal_bleeding: int
-    weight_loss: int
     bowel_changes: int
     abdominal_pain: int
     family_history_crc: int
     lynch_any: int
+    apc_any: int
+    mutyh_any: int
+    smad4_any: int
+    stk11_any: int
+    bmpr1a_any: int
 
 @app.get("/")
 def root():
@@ -81,10 +85,14 @@ def predict(patient: PatientInput):
         "wbc": patient.wbc,
         "family_history_crc": patient.family_history_crc,
         "rectal_bleeding": patient.rectal_bleeding,
-        "weight_loss": patient.weight_loss,
         "bowel_changes": patient.bowel_changes,
         "abdominal_pain": patient.abdominal_pain,
         "lynch_any": patient.lynch_any,
+        "apc_any": patient.apc_any,
+        "mutyh_any": patient.mutyh_any,
+        "smad4_any": patient.smad4_any,
+        "stk11_any": patient.stk11_any,
+        "bmpr1a_any": patient.bmpr1a_any,
     }
     result = predict_risk(renamed)
     return result

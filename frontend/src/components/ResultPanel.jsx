@@ -10,11 +10,23 @@ const featureLabels = {
   family_history_crc: "Family History of CRC",
   lynch_any: "Lynch Syndrome Variant",
   apc_any: "APC Variant",
+  mutyh_any: "MUTYH Variant",
+  smad4_any: "SMAD4 Variant",
+  stk11_any: "STK11 Variant",
+  bmpr1a_any: "BMPR1A Variant",
   rectal_bleeding: "Rectal Bleeding",
-  weight_loss: "Unexplained Weight Loss",
   high_creatinine: "High Creatinine",
   high_platelets: "High Platelets",
   low_platelets: "Low Platelets",
+  "Smoking: 100 Cigs Lifetime": "Smoking (100+ Cigarettes)",
+  "Alcohol: Alcohol Participant": "Alcohol Use",
+  "Alcohol: Drink Frequency Past Year": "Drink Frequency",
+  "Income: Annual Income": "Annual Income",
+  "Education Level: Highest Grade": "Education Level",
+  "Employment: Employment Status": "Employment Status",
+  "Insurance: Health Insurance": "Health Insurance",
+  "Marital Status: Current Marital Status": "Marital Status",
+  "The Basics: Sexual Orientation": "Sexual Orientation",
 };
 
 const riskConfig = {
@@ -53,7 +65,7 @@ export default function ResultPanel({ result, onReset }) {
     doc.setFontSize(10);
     doc.setTextColor(120);
     doc.text("Generated: " + new Date().toLocaleString(), 14, 38);
-    doc.text("Model: XGBoost v2 · AUC 0.8979 · 31 features", 14, 44);
+    doc.text("Model: XGBoost v3 · AUC 0.8003 · 34 features", 14, 44);
 
     // Score
     doc.setFontSize(24);
@@ -109,7 +121,7 @@ export default function ResultPanel({ result, onReset }) {
       <div className="mb-6 flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Risk Assessment Result</h2>
-          <p className="text-gray-500 text-sm mt-1">XGBoost v2 model · 31 features · NIH All of Us data</p>
+          <p className="text-gray-500 text-sm mt-1">XGBoost v3 model · 34 features · NIH All of Us data</p>
         </div>
         <div className="flex gap-2">
           <button onClick={handlePDF}

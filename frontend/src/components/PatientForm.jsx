@@ -8,8 +8,9 @@ const defaultValues = {
   bmi: 27.5, obese: 0, hypertension: 0,
   platelet_count: 250, creatinine: 0.9, high_creatinine: 0,
   high_platelets: 0, low_platelets: 0, alt: 25, ast: 22, wbc: 6.5,
-  rectal_bleeding: 0, weight_loss: 0, bowel_changes: 0, abdominal_pain: 0,
+  rectal_bleeding: 0, bowel_changes: 0, abdominal_pain: 0,
   family_history_crc: 0, lynch_any: 0, apc_any: 0,
+  mutyh_any: 0, smad4_any: 0, stk11_any: 0, bmpr1a_any: 0,
 };
 
 const sectionStyles = {
@@ -107,8 +108,6 @@ export default function PatientForm({ onSubmit, loading, error }) {
         <Section title="Symptoms" styleKey="symptoms">
           <Field label="Rectal Bleeding" name="rectal_bleeding" value={form.rectal_bleeding} onChange={handleChange}
             options={[{value:0,label:"No"},{value:1,label:"Yes"}]} />
-          <Field label="Unexplained Weight Loss" name="weight_loss" value={form.weight_loss} onChange={handleChange}
-            options={[{value:0,label:"No"},{value:1,label:"Yes"}]} />
           <Field label="Bowel Changes" name="bowel_changes" value={form.bowel_changes} onChange={handleChange}
             options={[{value:0,label:"No"},{value:1,label:"Yes"}]} />
           <Field label="Abdominal Pain" name="abdominal_pain" value={form.abdominal_pain} onChange={handleChange}
@@ -144,6 +143,14 @@ export default function PatientForm({ onSubmit, loading, error }) {
           <Field label="Lynch Syndrome Variant" name="lynch_any" value={form.lynch_any} onChange={handleChange}
             options={[{value:0,label:"No / Unknown"},{value:1,label:"Yes (pathogenic variant)"}]} />
           <Field label="APC Variant" name="apc_any" value={form.apc_any} onChange={handleChange}
+            options={[{value:0,label:"No / Unknown"},{value:1,label:"Yes (pathogenic variant)"}]} />
+          <Field label="MUTYH Variant" name="mutyh_any" value={form.mutyh_any} onChange={handleChange}
+            options={[{value:0,label:"No / Unknown"},{value:1,label:"Yes (pathogenic variant)"}]} />
+          <Field label="SMAD4 Variant" name="smad4_any" value={form.smad4_any} onChange={handleChange}
+            options={[{value:0,label:"No / Unknown"},{value:1,label:"Yes (pathogenic variant)"}]} />
+          <Field label="STK11 Variant" name="stk11_any" value={form.stk11_any} onChange={handleChange}
+            options={[{value:0,label:"No / Unknown"},{value:1,label:"Yes (pathogenic variant)"}]} />
+          <Field label="BMPR1A Variant" name="bmpr1a_any" value={form.bmpr1a_any} onChange={handleChange}
             options={[{value:0,label:"No / Unknown"},{value:1,label:"Yes (pathogenic variant)"}]} />
           <div className="col-span-2">
             <p className="text-xs text-gray-400 mt-1">

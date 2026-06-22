@@ -1,0 +1,34 @@
+gender
+race
+ethnicity
+age
+Alcohol: Alcohol Participant
+Alcohol: Drink Frequency Past Year
+Education Level: Highest Grade
+Employment: Employment Status
+Income: Annual Income
+Insurance: Health Insurance
+Marital Status: Current Marital Status
+Smoking: 100 Cigs Lifetime
+The Basics: Sexual Orientation
+obese
+hypertension
+high_creatinine
+high_platelets
+low_platelets
+family_history_crc
+lynch_any
+apc_any
+mutyh_any
+smad4_any
+stk11_any
+bmpr1a_any
+alt
+ast
+bmi
+creatinine
+platelet_count
+wbc
+abdominal_pain
+rectal_bleeding
+bowel_changes
