@@ -216,3 +216,7 @@ __marimo__/
 # Root-level working files (moved to backend/models/ or internal docs)
 best_xgb_v3_clean.pkl
 UPDATE_PLAN_1.pdf
+frontend_animation.pdf
+
+# Error/working screenshots
+Screenshot*.png

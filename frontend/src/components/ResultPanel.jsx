@@ -1,5 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { motion } from "framer-motion";
+import useCountUp from "../hooks/useCountUp";
 
 const featureLabels = {
   age: "Age", alt: "ALT (Liver Enzyme)", creatinine: "Creatinine",
@@ -50,36 +52,31 @@ const riskConfig = {
 export default function ResultPanel({ result, onReset }) {
   const { risk_score, risk_level, top_factors } = result;
   const c = riskConfig[risk_level];
+  const counted = useCountUp(risk_score, { duration: 1.5, decimals: 1, start: true });
 
   const handlePDF = () => {
     const doc = new jsPDF();
-
-    // Header bar
     doc.setFillColor(79, 70, 229);
     doc.rect(0, 0, 210, 28, "F");
     doc.setFontSize(16);
     doc.setTextColor(255);
     doc.text("CRC Risk Assessment Report", 14, 18);
 
-    // Meta
     doc.setFontSize(10);
     doc.setTextColor(120);
     doc.text("Generated: " + new Date().toLocaleString(), 14, 38);
     doc.text("Model: XGBoost v3 · AUC 0.8003 · 34 features", 14, 44);
 
-    // Score
     doc.setFontSize(24);
     doc.setTextColor(30);
     doc.text(risk_score + "%", 14, 62);
     doc.setFontSize(12);
     doc.text(risk_level + " RISK", 50, 62);
 
-    // Recommendation
     doc.setFontSize(10);
     doc.setTextColor(80);
     doc.text(c.message, 14, 72);
 
-    // Factors table
     doc.setFontSize(12);
     doc.setTextColor(30);
     doc.text("Top Contributing Factors", 14, 86);
@@ -95,7 +92,6 @@ export default function ResultPanel({ result, onReset }) {
       styles: { fontSize: 9 },
     });
 
-    // Footer
     doc.setFontSize(8);
     doc.setTextColor(160);
     doc.text("Research tool only — not for clinical diagnosis.", 14, doc.lastAutoTable.finalY + 12);
@@ -104,26 +100,25 @@ export default function ResultPanel({ result, onReset }) {
     doc.save("crc_risk_report.pdf");
   };
 
-  // Gauge geometry
-  const pct = risk_score / 100;
-  const r = 70, cx = 110, cy = 100;
-  const startAngle = Math.PI;
-  const endAngle = Math.PI + pct * Math.PI;
-  const x1 = cx + r * Math.cos(startAngle);
-  const y1 = cy + r * Math.sin(startAngle);
-  const x2 = cx + r * Math.cos(endAngle);
-  const y2 = cy + r * Math.sin(endAngle);
-  const largeArc = pct > 0.5 ? 1 : 0;
+  // Circular progress ring geometry (PDF spec: r=54, viewBox 120×120)
+  const R = 54;
+  const C = 2 * Math.PI * R; // ≈ 339.292
+  const fraction = risk_score / 100;
 
   return (
     <div>
-      {/* ── Header ── */}
+      {/* ── Header — buttons fade in last ── */}
       <div className="mb-6 flex items-start justify-between">
-        <div>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Risk Assessment Result</h2>
           <p className="text-gray-500 text-sm mt-1">XGBoost v3 model · 34 features · NIH All of Us data</p>
-        </div>
-        <div className="flex gap-2">
+        </motion.div>
+        <motion.div
+          className="flex gap-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.2, duration: 0.5 }}
+        >
           <button onClick={handlePDF}
             className="flex items-center gap-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -141,36 +136,60 @@ export default function ResultPanel({ result, onReset }) {
             </svg>
             New Patient
           </button>
-        </div>
+        </motion.div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* ── Score Card ── */}
-        <div className={`${c.bg} border ${c.border} rounded-xl p-6 flex flex-col items-center`}>
+        {/* ── Score Card — circular ring draws in ── */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+          className={`${c.bg} border ${c.border} rounded-xl p-6 flex flex-col items-center`}
+        >
           <span className={`text-xs font-semibold px-3 py-1 rounded-full ${c.badgeBg} ${c.text} mb-4`}>
             RISK SCORE
           </span>
 
-          <svg width="220" height="120" viewBox="0 0 220 120">
-            <path d={`M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}`}
-              fill="none" stroke="#e2e8f0" strokeWidth="12" strokeLinecap="round" />
-            <path d={`M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`}
-              fill="none" stroke={c.gauge} strokeWidth="12" strokeLinecap="round" />
-            <text x={cx} y={cy-10} textAnchor="middle" fontSize="32" fontWeight="700" fill={c.gauge}>
-              {risk_score}%
+          <svg width="200" height="200" viewBox="0 0 120 120">
+            {/* track */}
+            <circle cx="60" cy="60" r={R} fill="none" stroke="#e5e7eb" strokeWidth="8" />
+            {/* animated progress */}
+            <motion.circle
+              cx="60" cy="60" r={R} fill="none" stroke={c.gauge} strokeWidth="8"
+              strokeDasharray={C}
+              strokeLinecap="round"
+              transform="rotate(-90 60 60)"
+              initial={{ strokeDashoffset: C }}
+              animate={{ strokeDashoffset: C * (1 - fraction) }}
+              transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
+              style={{ willChange: "stroke-dashoffset" }}
+            />
+            <text x="60" y="58" textAnchor="middle" fontSize="22" fontWeight="700" fill={c.gauge}>
+              {counted}%
             </text>
-            <text x={cx} y={cy+10} textAnchor="middle" fontSize="11" fill="#94a3b8">Cancer Risk</text>
-            <text x={cx-r-2} y={cy+18} textAnchor="middle" fontSize="9" fill="#cbd5e1">0%</text>
-            <text x={cx+r+2} y={cy+18} textAnchor="middle" fontSize="9" fill="#cbd5e1">100%</text>
+            <text x="60" y="74" textAnchor="middle" fontSize="8" fill="#94a3b8">Cancer Risk</text>
           </svg>
 
-          <span className={`mt-3 text-lg font-bold ${c.text}`}>{risk_level} RISK</span>
-          <p className={`mt-2 text-sm ${c.text} text-center max-w-xs leading-relaxed opacity-80`}>
+          <motion.span
+            className={`mt-3 text-lg font-bold ${c.text}`}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2, duration: 0.5 }}
+          >
+            {risk_level} RISK
+          </motion.span>
+          <motion.p
+            className={`mt-2 text-sm ${c.text} text-center max-w-xs leading-relaxed opacity-80`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.8 }}
+            transition={{ delay: 1.4, duration: 0.5 }}
+          >
             {c.message}
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        {/* ── Top Factors ── */}
+        {/* ── Top Factors — staggered waterfall bars ── */}
         <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
           <span className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-600 mb-4 inline-block">
             TOP CONTRIBUTING FACTORS
@@ -182,7 +201,12 @@ export default function ResultPanel({ result, onReset }) {
               const maxImpact = Math.abs(top_factors[0].impact);
               const width = `${Math.max((Math.abs(f.impact) / maxImpact) * 100, 4)}%`;
               return (
-                <div key={i}>
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 1.5 + i * 0.1, duration: 0.4 }}
+                >
                   <div className="flex justify-between items-center text-xs mb-1.5">
                     <span className="font-medium text-gray-700">
                       {featureLabels[f.feature] || f.feature}
@@ -192,12 +216,15 @@ export default function ResultPanel({ result, onReset }) {
                     </span>
                   </div>
                   <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all ${isRisk ? "bg-red-400" : "bg-emerald-400"}`}
-                      style={{ width }}
+                    <motion.div
+                      className={`h-2 rounded-full ${isRisk ? "bg-red-400" : "bg-emerald-400"}`}
+                      initial={{ width: 0 }}
+                      animate={{ width }}
+                      transition={{ delay: 1.5 + i * 0.1, duration: 0.5, ease: "easeOut" }}
+                      style={{ willChange: "width" }}
                     />
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -210,10 +237,15 @@ export default function ResultPanel({ result, onReset }) {
       </div>
 
       {/* ── Disclaimer ── */}
-      <div className="mt-5 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700 flex items-start gap-2">
+      <motion.div
+        className="mt-5 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700 flex items-start gap-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.4, duration: 0.5 }}
+      >
         <span className="mt-0.5 flex-shrink-0">⚠️</span>
         <span>This tool is for research purposes only and should not be used as a substitute for professional medical advice, diagnosis, or treatment.</span>
-      </div>
+      </motion.div>
     </div>
   );
 }
